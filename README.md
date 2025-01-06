@@ -20,6 +20,21 @@ Before I started on the website, I created some python scripts. My process will 
 - `plot.py` this can plot historical data dumps
 - `hrv.py` this will do some hrv analysis on historical data dumps
 
+# Start docker
+
+In the root folder execute:
+
+```bash
+./scripts/build.sh
+```
+
+This creates and starts the docker container environment.
+
+## Access the application
+
+Access the application at http://localhost:3000 is only supported in Chrome and Edge. Enable experimental settings in Chrome settings for the Bluetooth Web API to work.
+
+
 ## Future + Contributions
 
 I am looking for people to help expand this project. I promise to not be strict and accept pull requests!
