@@ -1,0 +1,1 @@
+//At least one .ts file is needed for vite to compile.
