@@ -18,7 +18,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --verbose
 
 COPY ./app /backend/app
-COPY ./scripts /backend/scripts
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --verbose
