@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+dist-node/
+
+# Dependency directories
+*.lock
+
+.DS_Store
+
+.env
+
+.vscode/
+.idea/
+
