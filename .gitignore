@@ -1,4 +1,6 @@
 # Node modules
+dist-node
+dist
 node_modules/
 
 # Build output
