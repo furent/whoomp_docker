@@ -4,7 +4,10 @@ Fork of https://github.com/jogolden/whoomp
 Start the application using 
 - ./scripts/build.sh : THIS DOES NOT WORK CURRENTLY. PLEASE START MANUALLY USING UVICORN AND NPM RUN DEV
 
-or manually by creating a virtual environment for the backend and starting it using:
-`uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`
+This does work:
 
-and starting the frontend: `npm run dev`
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+uv sync # can be installed using pip install uv or via webpage uv package manager
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
