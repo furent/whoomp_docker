@@ -4,3 +4,5 @@ app.egg-info
 *.pyc
 .mypy_cache
 .venv
+logs.bin
+whoop_hist.bin

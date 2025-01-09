@@ -1,23 +1,28 @@
 services:
   backend:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
-    restart: always
-    env_file:
-      - .env
-    environment:
-      - DOMAIN=${DOMAIN}
-      - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
-    ports:
-      - "8000:8000"
     build:
       context: ./backend
-    command: >
-      uvicorn app.main:app
+    ports:
+      - "8000:8000"
+    develop:
+      watch:
+        - path: ./backend
+          action: sync
+          target: /app
+          ignore:
+            - ./backend/.venv
+            - .venv
+        - path: ./backend/pyproject.toml
+          action: rebuild
 
   frontend:
-    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
-    restart: always
     build:
-      context: ./frontend
+      context: .
+      dockerfile: src/Dockerfile
     ports:
       - "3000:80"
+    develop:
+      watch:
+        - path: ./src
+          action: sync
+          target: /app

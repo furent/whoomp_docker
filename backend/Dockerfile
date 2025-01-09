@@ -18,6 +18,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --verbose
 
 COPY ./app /backend/app
+COPY ./scripts /backend/scripts
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --verbose
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -22,3 +22,4 @@ app.include_router(packet_router, prefix="/packet")
 app.include_router(parser_router, prefix="/parser")
 app.include_router(plot_router, prefix="/plot")
 app.include_router(whoop_router, prefix="/whoop")
+
