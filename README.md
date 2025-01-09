@@ -6,8 +6,8 @@ Start the application using
 
 This does work:
 
-cd backend
-python -m venv .venv
-source .venv/bin/activate
-uv sync # can be installed using pip install uv or via webpage uv package manager
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+- cd backend
+- python -m venv .venv
+- source .venv/bin/activate
+- uv sync # can be installed using pip install uv or via webpage uv package manager
+- python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
