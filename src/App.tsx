@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { connectToWhoop, disconnectFromWhoop, sendToggleRealtime } from "./whoomp";
+import React, { useState, useEffect, useRef } from "react";
+import { connectToWhoop, disconnectFromWhoop, sendToggleRealtime, downloadHistory } from "./whoomp";
 import "./App.css";
 import { Line } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
+import { FaGithub } from 'react-icons/fa';
+
+
 
 Chart.register(...registerables);
 
@@ -19,6 +22,53 @@ function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
   const [terminalLogs, setTerminalLogs] = useState<string>("");
+  const [parsedHistoryData, setParsedHistoryData] = useState<{
+    timestamp: string;
+    heart_rate: number;
+    rr_intervals: number[];
+  }[] | null>(null);
+  const [showDevInfo, setShowDevInfo] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleParseHistory = async () => {
+    try {
+      // Trigger file input click
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    } catch (error: any) {
+      setErrorMessage(`Failed to parse history: ${error.message}`);
+    }
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/parse-history', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to parse history file');
+      }
+
+      const data = await response.json();
+      setParsedHistoryData(data);
+      handleNotification('History file parsed successfully');
+    } catch (error: any) {
+      setErrorMessage(`Failed to parse history: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [heartRateData, setHeartRateData] = useState<{
     labels: string[];
@@ -60,8 +110,11 @@ function App() {
 
   // Function to handle incoming logs
   const handleLog = (message: string) => {
-    console.log("Log received:", message);
-    setTerminalLogs((prevLogs) => prevLogs + message + "\n");
+    if (message && message.trim()) {
+      setTerminalLogs((prevLogs) => prevLogs + message + "\n");
+    } else {
+      console.warn("Received empty or invalid log data.");
+    }
   };
 
   // Cleanup on unmount
@@ -154,7 +207,7 @@ function App() {
         setErrorMessage("Failed to disconnect properly.");
         setLoading(false);
       }
-      
+
     }
   };
 
@@ -199,8 +252,125 @@ function App() {
     });
   };
 
+  const handleDownloadHistory = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      await downloadHistory({
+        onNotification: handleNotification, // Pass the notification handler
+      });
+      // setNotification is now handled via the callback in downloadHistory
+    } catch (error: any) {
+      setErrorMessage("History download failed.");
+      console.error("Download History Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  interface DevInfo {
+    bugs: string[];
+    features: string[];
+    todo: string[];
+  }
+
+  const DevelopmentInfo: React.FC<DevInfo> = ({ bugs, features, todo }) => {
+    return (
+      <div className="fixed right-0 top-0 w-80 h-screen bg-gray-900 p-6 overflow-y-auto">
+        <h2 className="text-2xl font-bold text-white mb-6">Development Info</h2>
+
+        {/* Known Bugs */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-red-400 mb-2">Known Bugs</h3>
+          <ul className="list-disc list-inside text-red-300">
+            {bugs.map((bug, index) => (
+              <li key={`bug-${index}`} className="mb-2">{bug}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Current Features */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-green-400 mb-2">Current Features</h3>
+          <ul className="list-disc list-inside text-green-300">
+            {features.map((feature, index) => (
+              <li key={`feature-${index}`} className="mb-2">{feature}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Todo List */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-yellow-400 mb-2">Todo</h3>
+          <ul className="list-disc list-inside text-yellow-300">
+            {todo.map((item, index) => (
+              <li key={`todo-${index}`} className="mb-2">{item}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+  const devInfo = {
+    bugs: [
+      "Clock sync issues with device",
+      "Occasional disconnect on data download",
+      "Parser sometimes fails with large files",
+      "Time offset calculation needs improvement",
+      "If Pairing issues: Unpair from whoop app in device settings"
+    ],
+    features: [
+      "Real-time heart rate monitoring",
+      "Battery level tracking",
+      "Historical data download",
+      "Data parsing and visualization",
+      "Device status monitoring",
+      "Terminal logging",
+      "BLE connection management",
+    ],
+    todo: [
+      "Implement data export to CSV/Excel",
+      "Add data filtering options",
+      "Improve error handling",
+      "Add user settings",
+      "Implement dark/light mode toggle",
+      "Add data visualization options",
+      "Implement data backup",
+      "Document device workflow",
+      "Document terminal logs and map them to certain actions",
+      "Add docker support for easy startup",
+      "Add open-webui/ollama integration as the equivalent to whoop coach beta so we can talk to RT-data and historical data"
+    ],
+  };
+
   return (
     <div className="bg-black min-h-screen p-8">
+      {/* Fork Info - Top Left */}
+      <div className="fixed top-4 left-4 bg-gray-700 rounded-lg p-4 flex flex-col space-y-2 max-w-md">
+        <div className="flex items-center space-x-2">
+          <p className="text-gray-300 text-base">
+            This is a fork of{' '}
+            <a
+              href="https://github.com/jogolden/whoomp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 underline"
+            >
+              github.com/jogolden/whoomp
+            </a>
+          </p>
+          <a
+            href="https://github.com/jogolden/whoomp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-300 hover:text-white transition-colors flex-shrink-0"
+          >
+            <FaGithub size={22} />
+          </a>
+        </div>
+        <p className="text-gray-300 text-base">Much thanks to jogolden!</p>
+      </div>
       <div className="max-w-4xl mx-auto bg-gray-800 rounded-lg shadow-lg p-8">
         {/* Header */}
         <header className="mb-6">
@@ -230,9 +400,8 @@ function App() {
           <button
             onClick={handleConnect}
             disabled={loading}
-            className={`${
-              isConnected ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
-            } text-white font-semibold py-2 px-6 rounded shadow-md transition duration-200 ease-in-out disabled:opacity-50`}
+            className={`${isConnected ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
+              } text-white font-semibold py-2 px-6 rounded shadow-md transition duration-200 ease-in-out disabled:opacity-50`}
           >
             {loading ? "Processing..." : isConnected ? "Disconnect" : "Connect WHOOP"}
           </button>
@@ -240,19 +409,39 @@ function App() {
           <button
             onClick={handleToggleRealtime}
             disabled={!isConnected}
-            className={`${
-              isRealtimeActive ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
-            } text-white font-semibold py-2 px-6 rounded shadow-md transition duration-200 ease-in-out disabled:opacity-50`}
+            className={`${isRealtimeActive ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
+              } text-white font-semibold py-2 px-6 rounded shadow-md transition duration-200 ease-in-out disabled:opacity-50`}
           >
             {isRealtimeActive ? "Stop Heart Rate" : "Start Heart Rate"}
           </button>
 
           <button
+            onClick={handleDownloadHistory}
             disabled={!isConnected}
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow-md transition duration-200 ease-in-out disabled:opacity-50"
           >
             Download History
           </button>
+          <button
+            onClick={handleParseHistory}
+            disabled={loading}
+            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded shadow-md transition duration-200 ease-in-out disabled:opacity-50"
+          >
+            Parse History
+          </button>
+          <button
+            onClick={() => setShowDevInfo(!showDevInfo)}
+            className="fixed top-4 right-4 z-50 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+          >
+            {showDevInfo ? "Hide Dev Info" : "Show Dev Info"}
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept=".bin"
+            style={{ display: 'none' }}
+          />
         </div>
 
         {/* Device Information */}
@@ -264,15 +453,14 @@ function App() {
               <div className="flex items-center mt-4">
                 <div className="w-full bg-gray-600 rounded-full h-4 mr-3">
                   <div
-                    className={`h-4 rounded-full ${
-                      batteryLevel !== null
-                        ? batteryLevel < 20
-                          ? "bg-red-500"
-                          : batteryLevel < 50
+                    className={`h-4 rounded-full ${batteryLevel !== null
+                      ? batteryLevel < 20
+                        ? "bg-red-500"
+                        : batteryLevel < 50
                           ? "bg-yellow-500"
                           : "bg-green-500"
-                        : "bg-gray-500"
-                    }`}
+                      : "bg-gray-500"
+                      }`}
                     style={{ width: `${batteryLevel !== null ? batteryLevel : 0}%` }}
                   ></div>
                 </div>
@@ -294,9 +482,8 @@ function App() {
             <div className="bg-gray-700 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-white">Charging Status</h3>
               <p
-                className={`mt-4 text-sm font-semibold ${
-                  isCharging ? "text-green-500" : "text-red-500"
-                }`}
+                className={`mt-4 text-sm font-semibold ${isCharging ? "text-green-500" : "text-red-500"
+                  }`}
               >
                 {isCharging ? "Charging" : "Not Charging"}
               </p>
@@ -306,9 +493,8 @@ function App() {
             <div className="bg-gray-700 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-white">Wrist Status</h3>
               <p
-                className={`mt-4 text-sm font-semibold ${
-                  isWorn ? "text-green-500" : "text-red-500"
-                }`}
+                className={`mt-4 text-sm font-semibold ${isWorn ? "text-green-500" : "text-red-500"
+                  }`}
               >
                 {isWorn ? "On" : "Off"}
               </p>
@@ -399,16 +585,50 @@ function App() {
           </div>
         )}
 
-        {/* Terminal Logs */}
-        {terminalLogs && (
-          <div className="bg-gray-700 rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Terminal Logs</h3>
-            <div className="max-h-60 overflow-auto bg-gray-900 text-green-400 p-4 rounded">
-              <pre>{terminalLogs}</pre>
+        {isConnected && (
+          <div className="mt-6">
+            {/* Terminal Logs Section */}
+            <div className="bg-gray-700 rounded-lg shadow p-6 mt-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Terminal Logs</h3>
+              <div className="max-h-60 overflow-auto bg-gray-900 text-green-400 p-4 rounded">
+                <pre>{terminalLogs}</pre>
+              </div>
             </div>
           </div>
         )}
       </div>
+      {parsedHistoryData && (
+        <div className="bg-gray-700 rounded-lg shadow p-6 mt-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Parsed History Data</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-gray-300">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Timestamp</th>
+                  <th className="px-4 py-2">Heart Rate</th>
+                  <th className="px-4 py-2">RR Intervals</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parsedHistoryData.map((record, index) => (
+                  <tr key={index} className="border-t border-gray-600">
+                    <td className="px-4 py-2">{record.timestamp}</td>
+                    <td className="px-4 py-2">{record.heart_rate}</td>
+                    <td className="px-4 py-2">{record.rr_intervals.join(', ')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      {showDevInfo && (
+        <DevelopmentInfo
+          bugs={devInfo.bugs}
+          features={devInfo.features}
+          todo={devInfo.todo}
+        />
+      )}
     </div>
   );
 }

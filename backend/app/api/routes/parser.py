@@ -1,5 +1,11 @@
 
 import sys, struct, datetime, pytz, numpy as np
+from .packet import *
+import pandas as pd
+import tzlocal 
+
+
+
 
 from fastapi import APIRouter, HTTPException
 
@@ -12,11 +18,25 @@ class HistoricalRecord:
         self.rr = rr
     
     def timestamp(self):
-        dt = datetime.datetime.fromtimestamp(self.unix)
-        est_timezone = pytz.timezone("US/Eastern")
-        dt_est = dt.astimezone(est_timezone)
+        raw_timestamp = self.unix
 
-        return dt_est.strftime('%Y-%m-%d %I:%M:%S %p')
+        # Debugging: Log raw timestamp
+        print(f"Raw unix timestamp: {raw_timestamp}")
+
+        # Apply offset
+        offset = 104330455  # Replace with calculated offset
+        adjusted_timestamp = raw_timestamp - offset
+
+        # Convert to seconds if in milliseconds
+        if adjusted_timestamp > 1e10:  # Likely in milliseconds
+            adjusted_timestamp /= 1000
+
+        # Convert to datetime and adjust to Berlin timezone
+        dt = datetime.datetime.utcfromtimestamp(adjusted_timestamp).replace(tzinfo=pytz.utc)
+        berlin_timezone = pytz.timezone("Europe/Berlin")
+        dt_berlin = dt.astimezone(berlin_timezone)
+        return dt_berlin.strftime('%Y-%m-%d %I:%M:%S %p')
+        
 
     def __repr__(self):
         return f"HistoricalRecord(timestamp={self.timestamp()}, heart_rate={self.heart_rate})"
@@ -168,3 +188,23 @@ if __name__ == "__main__":
 
     print(records[-1])
     print(len(records))
+
+        # Create a list of dictionaries for pandas
+    data = [{
+        'timestamp': record.timestamp(),
+        'heart_rate': record.heart_rate,
+        'rr_intervals': record.rr
+    } for record in records]
+    
+    # Convert to pandas DataFrame
+    df = pd.DataFrame(data)
+    
+    # Save as CSV
+    csv_filename = sys.argv[1].replace('.bin', '.csv')
+    df.to_csv(csv_filename, index=False)
+    print(f"Data saved to {csv_filename}")
+    
+    # Optionally, save as Excel
+    excel_filename = sys.argv[1].replace('.bin', '.xlsx')
+    df.to_excel(excel_filename, index=False)
+    print(f"Data saved to {excel_filename}")

@@ -6,6 +6,8 @@ from app.api.routes.packet import router as packet_router
 from app.api.routes.parser import router as parser_router
 from app.api.routes.plot import router as plot_router
 from app.api.routes.whoop import router as whoop_router
+from app.api.routes.parse_history import router as history_router
+
 
 app = FastAPI()
 
@@ -22,4 +24,6 @@ app.include_router(packet_router, prefix="/packet")
 app.include_router(parser_router, prefix="/parser")
 app.include_router(plot_router, prefix="/plot")
 app.include_router(whoop_router, prefix="/whoop")
+app.include_router(history_router, prefix="/api")
+
 
