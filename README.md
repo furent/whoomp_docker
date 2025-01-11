@@ -1,4 +1,7 @@
 Fork of https://github.com/jogolden/whoomp
+![Screenshot 2025-01-11 at 04 46 30](https://github.com/user-attachments/assets/536a368a-82fe-48dc-9d40-920489473151)
+![Screenshot 2025-01-11 at 04 54 39](https://github.com/user-attachments/assets/75a09dbb-d974-4a5f-b2fe-ee4fc5ae68fa)
+![Screenshot 2025-01-11 at 04 58 50](https://github.com/user-attachments/assets/161b067f-d01d-4ca6-a673-d993357735f3)
 
 # Start the application
 Start the application using 
