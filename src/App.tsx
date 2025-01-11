@@ -601,8 +601,8 @@ function App() {
         <div className="bg-gray-700 rounded-lg shadow p-6 mt-6">
           <h3 className="text-lg font-semibold text-white mb-4">Parsed History Data</h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-gray-300">
-              <thead>
+            <table className="table-auto w-full text-left text-gray-300">
+              <thead className="bg-gray-800">
                 <tr>
                   <th className="px-4 py-2">Timestamp</th>
                   <th className="px-4 py-2">Heart Rate</th>
@@ -614,7 +614,7 @@ function App() {
                   <tr key={index} className="border-t border-gray-600">
                     <td className="px-4 py-2">{record.timestamp}</td>
                     <td className="px-4 py-2">{record.heart_rate}</td>
-                    <td className="px-4 py-2">{record.rr_intervals.join(', ')}</td>
+                    <td className="px-4 py-2">{record.rr_intervals.join(", ")}</td>
                   </tr>
                 ))}
               </tbody>
