@@ -4,16 +4,14 @@ Fork of https://github.com/jogolden/whoomp
 ![Screenshot 2025-01-11 at 04 58 50](https://github.com/user-attachments/assets/161b067f-d01d-4ca6-a673-d993357735f3)
 
 # Start the application
-Start the application using 
 - ./scripts/build.sh : THIS DOES NOT WORK CURRENTLY. PLEASE START MANUALLY USING UVICORN AND NPM RUN DEV
 
 This does work:
 
 - cd backend
-- python -m venv .venv
+- uv sync
 - source .venv/bin/activate
-- uv sync # can be installed using pip install uv or via webpage uv package manager
-- python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+- uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 - cd ..
 - npm install
 - npm run dev
