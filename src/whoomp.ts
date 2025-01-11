@@ -222,10 +222,8 @@ function parseVersionData(dataView: DataView): { harvard: string; boylston: stri
 }
 
 /**
- * This will download the history from your WHOOP
+ * This will download the history from your WHOOP (Blob-based downloadHistory)
  */
-// whoomp.ts (Blob-based downloadHistory)
-// whoomp.ts
 
 
 export async function downloadHistory(callbacks: ConnectCallbacks = {}): Promise<void> {
