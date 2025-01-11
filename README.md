@@ -1,7 +1,6 @@
 Fork of https://github.com/jogolden/whoomp
-![Screenshot 2025-01-11 at 04 46 30](https://github.com/user-attachments/assets/536a368a-82fe-48dc-9d40-920489473151)
-![Screenshot 2025-01-11 at 04 54 39](https://github.com/user-attachments/assets/75a09dbb-d974-4a5f-b2fe-ee4fc5ae68fa)
-![Screenshot 2025-01-11 at 04 58 50](https://github.com/user-attachments/assets/161b067f-d01d-4ca6-a673-d993357735f3)
+![2025-01-1107 33 02-ezgif com-optimize](https://github.com/user-attachments/assets/a5ea850d-ab91-44fb-93f5-3d9c282d63da)
+
 
 # Start the application
 - ./scripts/build.sh : THIS DOES NOT WORK CURRENTLY. PLEASE START MANUALLY USING UVICORN AND NPM RUN DEV
