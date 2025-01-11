@@ -607,6 +607,7 @@ function App() {
                   <th className="px-4 py-2">Timestamp</th>
                   <th className="px-4 py-2">Heart Rate</th>
                   <th className="px-4 py-2">RR Intervals</th>
+                  <th className="px-4 py-2">HRV(using RMSSD: TODO)</th>
                 </tr>
               </thead>
               <tbody>
@@ -615,6 +616,7 @@ function App() {
                     <td className="px-4 py-2">{record.timestamp}</td>
                     <td className="px-4 py-2">{record.heart_rate}</td>
                     <td className="px-4 py-2">{record.rr_intervals.join(", ")}</td>
+                    <td className="px-4 py-2">{}</td>
                   </tr>
                 ))}
               </tbody>
