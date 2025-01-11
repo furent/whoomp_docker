@@ -15,6 +15,9 @@ dependencies = [
     "bleak",
     "prompt_toolkit",
     "plotly",
+    "pandas>=2.2.3",
+    "tzlocal>=5.2",
+    "python-multipart>=0.0.20",
 ]
 
 [build-system]
