@@ -314,11 +314,12 @@ function App() {
 
   const devInfo = {
     bugs: [
-      "Clock sync issues with device",
-      "Occasional disconnect on data download",
-      "Parser sometimes fails with large files",
-      "Time offset calculation needs improvement",
-      "If Pairing issues: Unpair from whoop app in device settings"
+      "Clock sync issues with device. It is set to 2028 internally currently.",
+      "Occasional disconnect on data download.",
+      "Parser always fails with large files",
+      "Large historical data is not being downloaded on download. Need to try to download like 20 times until logs show download and the download finishes when file downloaded.",
+      "If Pairing issues: Unpair from whoop app in device settings",
+      "When download stuck due to large file, most buttons are blocked and infinite processing display button."
     ],
     features: [
       "Real-time heart rate monitoring",
@@ -328,6 +329,7 @@ function App() {
       "Device status monitoring",
       "Terminal logging",
       "BLE connection management",
+      "Soon RMSSD(HRV), column is already there."
     ],
     todo: [
       "Implement data export to CSV/Excel",
@@ -336,6 +338,8 @@ function App() {
       "Add user settings",
       "Implement dark/light mode toggle",
       "Add data visualization options",
+      "Implement RMSDD(HRV)",
+      "Implement arythmia detection using RMSSD and HRV Triangular Index",
       "Implement data backup",
       "Document device workflow",
       "Document terminal logs and map them to certain actions",
