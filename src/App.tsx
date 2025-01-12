@@ -332,6 +332,9 @@ function App() {
       "Soon RMSSD(HRV), column is already there."
     ],
     todo: [
+      "ON_THE_WAY:",
+      "settings,profiles,export/import data, pyscript support for custom graphs directly on page, local FileSystem support storage, storing custom graphs in settings",
+      "PLANNED:",
       "Implement data export to CSV/Excel",
       "Add data filtering options",
       "Improve error handling",
